@@ -39,7 +39,7 @@ to quickly create a Cobra application.`,
 		}
 
 		for activity, time := range activities {
-			fmt.Printf("You spend %v minutes on %s \n", utils.SecondsToTime(time), activity)
+			fmt.Printf("You spent %v minutes on %s \n", utils.SecondsToTime(time), activity)
 		}
 	},
 }
