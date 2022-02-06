@@ -5,7 +5,12 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/csv"
+	"errors"
 	"log"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 	"tracker/utils"
 
@@ -35,18 +40,66 @@ to quickly create a Cobra application.`,
 		timer := createTimer()
 		timer.startTimer()
 
-		// activityName := strings.Join(args, "")
+		activityName := strings.Join(args, "")
 
 		uiEvents := ui.PollEvents()
 		for {
 			e := <-uiEvents
 			switch e.ID {
 			case "q", "<C-c>":
-				// Save time to csv
+				row := getRow(timer.currentTime, activityName)
+				writeRowToCsv(getCsvPath(), row)
 				return
 			}
 		}
 	},
+}
+
+func getRow(elapsedTime int, activityName string) []string {
+	return []string{activityName, time.Now().String(), utils.SecondsToTime(elapsedTime)}
+}
+
+func getCsvPath() string {
+	homeDir, err := os.UserHomeDir()
+	check(err)
+	fileName := ".tracker.csv"
+	return filepath.Join(homeDir, fileName)
+}
+
+func writeRowToCsv(filePath string, row []string) {
+	createFileIfNotExists(filePath)
+	file := openFile(filePath)
+	appendToCsv(file, row)
+}
+
+func appendToCsv(file *os.File, row []string) {
+	w := csv.NewWriter(file)
+	if err := w.Write(row); err != nil {
+		log.Fatalln("error writing record to csv:", err)
+	}
+	w.Flush()
+}
+
+func openFile(filePath string) *os.File {
+	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	check(err)
+	return file
+}
+
+func createFileIfNotExists(filePath string) {
+	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+		file, err := os.Create(filePath)
+		if err != nil {
+			log.Fatalln("Failed creating file", err)
+		}
+		file.Close()
+	}
+}
+
+func check(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
 type Timer struct {
