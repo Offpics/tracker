@@ -57,6 +57,8 @@ func getRecordsFromCSV(filePath string) []types.Record {
 		parsedRecords = append(parsedRecords, types.RecordFromStringArray(row))
 	}
 
+	file.Close()
+
 	return parsedRecords
 }
 
