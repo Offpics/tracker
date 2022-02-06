@@ -14,6 +14,7 @@ import (
 
 var cfgFile string
 var sessionTime string
+var csvFilePath string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -51,6 +52,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tracker.yaml)")
 	rootCmd.PersistentFlags().StringVar(&sessionTime, "sessionTime", "1500", "sessionTime in seconds")
 	viper.BindPFlag("sessionTime", rootCmd.PersistentFlags().Lookup("sessionTime"))
+
+	rootCmd.PersistentFlags().StringVar(&csvFilePath, "csvFilePath", "/home/offpics/.tracker.csv", "csvFilePath")
+	viper.BindPFlag("csvFilePath", rootCmd.PersistentFlags().Lookup("csvFilePath"))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

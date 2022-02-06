@@ -8,13 +8,13 @@ import (
 )
 
 type Record struct {
-	activityName string
-	time         int
-	date         time.Time
+	ActivityName string
+	Time         int
+	Date         time.Time
 }
 
 func (record Record) ToStringArray() []string {
-	return []string{record.activityName, fmt.Sprintf("%v", record.time), record.date.String()}
+	return []string{record.ActivityName, fmt.Sprintf("%v", record.Time), record.Date.Format(time.RFC3339)}
 }
 
 func RecordFromStringArray(record []string) Record {
