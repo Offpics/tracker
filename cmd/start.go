@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"tracker/types"
 	"tracker/utils"
 
 	"github.com/spf13/cobra"
@@ -47,34 +48,30 @@ to quickly create a Cobra application.`,
 			e := <-uiEvents
 			switch e.ID {
 			case "q", "<C-c>":
-				row := getRow(timer.currentTime, activityName)
-				writeRowToCsv(getCsvPath(), row)
+				record := types.MakeRecord(timer.currentTime, activityName)
+				writeRecordToCsv(getCsvPath(), record)
 				return
 			}
 		}
 	},
 }
 
-func getRow(elapsedTime int, activityName string) []string {
-	return []string{activityName, time.Now().String(), utils.SecondsToTime(elapsedTime)}
-}
-
 func getCsvPath() string {
 	homeDir, err := os.UserHomeDir()
-	check(err)
+	utils.Check(err)
 	fileName := ".tracker.csv"
 	return filepath.Join(homeDir, fileName)
 }
 
-func writeRowToCsv(filePath string, row []string) {
+func writeRecordToCsv(filePath string, record types.Record) {
 	createFileIfNotExists(filePath)
 	file := openFile(filePath)
-	appendToCsv(file, row)
+	appendToCsv(file, record)
 }
 
-func appendToCsv(file *os.File, row []string) {
+func appendToCsv(file *os.File, record types.Record) {
 	w := csv.NewWriter(file)
-	if err := w.Write(row); err != nil {
+	if err := w.Write(record.ToStringArray()); err != nil {
 		log.Fatalln("error writing record to csv:", err)
 	}
 	w.Flush()
@@ -82,7 +79,7 @@ func appendToCsv(file *os.File, row []string) {
 
 func openFile(filePath string) *os.File {
 	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	check(err)
+	utils.Check(err)
 	return file
 }
 
@@ -93,12 +90,6 @@ func createFileIfNotExists(filePath string) {
 			log.Fatalln("Failed creating file", err)
 		}
 		file.Close()
-	}
-}
-
-func check(err error) {
-	if err != nil {
-		panic(err)
 	}
 }
 
