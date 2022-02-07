@@ -9,7 +9,6 @@ import (
 	"errors"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 	"tracker/types"
@@ -49,18 +48,11 @@ to quickly create a Cobra application.`,
 			switch e.ID {
 			case "q", "<C-c>":
 				record := types.MakeRecord(timer.currentTime, activityName)
-				writeRecordToCsv(getCsvPath(), record)
+				writeRecordToCsv(utils.GetCsvPath(), record)
 				return
 			}
 		}
 	},
-}
-
-func getCsvPath() string {
-	homeDir, err := os.UserHomeDir()
-	utils.Check(err)
-	fileName := ".tracker.csv"
-	return filepath.Join(homeDir, fileName)
 }
 
 func writeRecordToCsv(filePath string, record types.Record) {

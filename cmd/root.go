@@ -7,6 +7,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"tracker/utils"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -53,7 +54,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&sessionTime, "sessionTime", "1500", "sessionTime in seconds")
 	viper.BindPFlag("sessionTime", rootCmd.PersistentFlags().Lookup("sessionTime"))
 
-	rootCmd.PersistentFlags().StringVar(&csvFilePath, "csvFilePath", "/home/offpics/.tracker.csv", "csvFilePath")
+	rootCmd.PersistentFlags().StringVar(&csvFilePath, "csvFilePath", utils.GetCsvPath(), "csvFilePath")
 	viper.BindPFlag("csvFilePath", rootCmd.PersistentFlags().Lookup("csvFilePath"))
 
 	// Cobra also supports local flags, which will only run
@@ -69,7 +70,7 @@ func initConfig() {
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
+		utils.Check(err)
 
 		// Search config in home directory with name ".tracker" (without extension).
 		viper.AddConfigPath(home)
