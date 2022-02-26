@@ -7,6 +7,7 @@ package cmd
 import (
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -37,10 +38,10 @@ to quickly create a Cobra application.`,
 		}
 		defer ui.Close()
 
-		timer := createTimer()
-		timer.startTimer()
-
 		activityName := strings.Join(args, "")
+
+		timer := createTimer()
+		timer.startTimer(activityName)
 
 		uiEvents := ui.PollEvents()
 		for {
@@ -90,10 +91,14 @@ type Timer struct {
 	ticker      *time.Ticker
 }
 
-func (timer *Timer) startTimer() {
+func getDisplayText(activityName, time string) string {
+	return fmt.Sprintf("%s - %s", strings.Title(activityName), time)
+}
+
+func (timer *Timer) startTimer(activityName string) {
 	paragraph := widgets.NewParagraph()
-	paragraph.Text = utils.SecondsToTime(timer.currentTime)
-	paragraph.SetRect(0, 0, 25, 5)
+	paragraph.Text = getDisplayText(activityName, utils.SecondsToTime(timer.currentTime))
+	paragraph.SetRect(0, 0, 20, 4)
 
 	ui.Render(paragraph)
 
@@ -101,7 +106,7 @@ func (timer *Timer) startTimer() {
 		for {
 			<-timer.ticker.C
 			timer.currentTime += 1
-			paragraph.Text = utils.SecondsToTime(timer.currentTime)
+			paragraph.Text = getDisplayText(activityName, utils.SecondsToTime(timer.currentTime))
 			ui.Render(paragraph)
 		}
 	}()
